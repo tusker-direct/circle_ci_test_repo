@@ -1,0 +1,24 @@
+version: 2.1
+
+jobs:
+  test:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - run:
+          name: Run simple test
+          command: echo "Running tests on circleci_test branch"
+
+workflows:
+  version: 2
+  test-workflow:
+    jobs:
+      - test:
+          filters:
+            branches:
+              only: 
+                - circle_ci_config
+            tags:
+              only:
+                - circleci_test
