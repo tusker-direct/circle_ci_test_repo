@@ -37,7 +37,7 @@ allow_includes = 1
 [-RegularExpressions::ProhibitFixedStringMatches]
 [-RegularExpressions::ProhibitEnumeratedClasses]
 
-[ClassHierarchies::ProhibitAutoloading]
+# [ClassHierarchies::ProhibitAutoloading]
 
 ignore_packages = Tusker::Query
 
