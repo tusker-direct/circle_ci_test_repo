@@ -1,4 +1,4 @@
-package Basic; 
+package Basic;
 use Mojo::Base -strict;
 
 use lib "lib";
