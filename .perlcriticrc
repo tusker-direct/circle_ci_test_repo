@@ -67,5 +67,5 @@ severity = 1
 [Variables::ProhibitPackageVars]
 packages = Data::Dumper File::Find FindBin Log::Log4perl Text::Wrap
 
-[Subroutines::ProhibitSubroutinePrototypes]
+[-Subroutines::ProhibitSubroutinePrototypes]
 ignore_packages=MyApp MyApp::Controller::Example Basic
