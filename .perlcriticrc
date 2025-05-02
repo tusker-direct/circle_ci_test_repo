@@ -2,11 +2,11 @@ severity = 3
 theme = bugs + security + certrec + certrule + core + tusker
 verbose = %f line %l col %c\n    [%s] %p (%e) = %m\n    %r\n
 
-[InputOutput::RequireCheckedSyscalls]
+# [InputOutput::RequireCheckedSyscalls]
 functions = :builtins
 exclude_functions = print close sleep
 
-[BuiltinFunctions::ProhibitStringyEval]
+# [BuiltinFunctions::ProhibitStringyEval]
 allow_includes = 1
 
 # [-CodeLayout::ProhibitHardTabs]
@@ -41,7 +41,7 @@ allow_includes = 1
 
 ignore_packages = Tusker::Query
 
-[RegularExpressions::ProhibitComplexRegexes]
+# [RegularExpressions::ProhibitComplexRegexes]
 max_characters = 70
 
 #[CodeLayout::RequireTidyCode]
@@ -53,16 +53,16 @@ max_characters = 70
 # New code will be run with severity -1 to catch these, existing code with -3 to ignore them.
 # (This applies to perlcritic being run in a test pipeline or git hook)
 
-[Modules::ProhibitAutomaticExportation]
+# [Modules::ProhibitAutomaticExportation]
 severity = 1
 
-[Subroutines::ProhibitManyArgs]
+# [Subroutines::ProhibitManyArgs]
 max_arguments = 3
 severity = 1
 skip_object = 1
 
-[Subroutines::ProhibitUnusedPrivateSubroutines]
+# [Subroutines::ProhibitUnusedPrivateSubroutines]
 severity = 1
 
-[Variables::ProhibitPackageVars]
+# [Variables::ProhibitPackageVars]
 packages = Data::Dumper File::Find FindBin Log::Log4perl Text::Wrap
