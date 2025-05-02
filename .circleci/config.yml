@@ -127,6 +127,12 @@ jobs:
     steps:
       - checkout
       - aws_auth
+      # - run:
+      #     name: Build Docker Image
+      #     command: docker-compose build
+      # - run:
+      #     name: Run tests in container
+      #     command: docker-compose run --rm carton exec -- prove -v
       - run:
           name: Run tests
           command: |
