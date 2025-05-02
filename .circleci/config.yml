@@ -129,10 +129,10 @@ jobs:
       - aws_auth
       - run:
           name: Build Docker Image
-          command: docker-compose build
+          command: docker compose build
       - run:
           name: Run Docker Image
-          command: docker-compose up -d
+          command: docker compose up -d
       - run:
           name: Run tests in container
           command: docker exec -it my_app_web_1 bash -c "carton exec -- prove -v t/"
