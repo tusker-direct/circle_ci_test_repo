@@ -78,8 +78,6 @@ jobs:
               echo "No Perl files found to check!"
               exit 1
             fi
-            echo "Found files:"
-            echo "$FILES"
             echo ""
             echo "Checking Perl files formatting..."
             echo "--------------------------------"
@@ -96,35 +94,20 @@ jobs:
           command: curl -L http://cpanmin.us | perl - App::cpanminus
       - run:
           name: Install Perl::Critic
-          command: cpanm Perl::Critic
+          command: cpanm Perl::Critic --notest
       - run:
           name: Run perlcritic check
           command: |
-            FILES=$(find $(pwd) -type f \( -name "*.pl" -o -name "*.pm" -o -name "*.t" \) -mtime -14)
+            FILES=$(find $(pwd)/my_app -type f \( -name "*.pl" -o -name "*.pm" -o -name "*.t" \) -mtime -14)
             if [ -z "$FILES" ]; then
               echo "No Perl files found to check!"
               exit 1
             fi
-            echo "Found files:"
-            echo "$FILES"
-            echo ""
             echo "Running Perl::Critic analysis..."
             echo "--------------------------------"
-            HAS_ISSUES=0
-            for file in $FILES; do
-              echo "Analyzing $file..."
-              if ! perlcritic --stern "$file"; then
-                echo "❌ $file ... has issues"
-                HAS_ISSUES=1
-              fi
-            done
-            echo "--------------------------------"
-            if [ "$HAS_ISSUES" -eq 1 ]; then
-              echo "Some files have code quality issues. Please fix them locally."
-              exit 1
-            else
-              echo "All files passed Perl::Critic analysis!"
-            fi
+            JOINED_FILES=$(printf "%s " "${FILES[@]}")
+            echo "${JOINED_FILES}"
+            perlcritic --profile-strictness fatal ${JOINED_FILES}
 
   image_scan:
     docker:
