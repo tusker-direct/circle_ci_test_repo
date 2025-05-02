@@ -1,51 +1,32 @@
 version: 2.1
 
-jobs:
-  build:
-    docker:
-      - image: cimg/base:stable
-    steps:
-      - checkout
-
-  perltidy_check:
-    docker# Use the latest 2.1 version of CircleCI pipeline process engine.
-# See: https://circleci.com/docs/configuration-reference
-version: 2.1
-
-# Import reusable packages (orbs) for AWS ECR, AWS CLI, and ECR scanning
 orbs:
   aws-ecr: circleci/aws-ecr@9.0.2
   aws-cli: circleci/aws-cli@4.1
   ecr-scan-orb: tusker-direct/ecr-scan-orb@1.0
 
-# Define configurable parameters for the pipeline
 parameters:
   service-name:
     type: string
-    default: "circleci-test"  # Name of the service
+    default: "circleci-test"
   image-repo-name:
     type: string
-    default: "tusker-direct/circleci-test"  # ECR repository path
+    default: "tusker-direct/circleci-test"
   image-name:
     type: string
-    default: "${AWS_ECR_REGISTRY_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/tusker-direct/redis_test"  # Full ECR image URI
+    default: "${AWS_ECR_REGISTRY_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/tusker-direct/redis_test"
   image-tag:
     type: string
-    default: "${CIRCLE_SHA1}"  # Image tag using the current commit SHA
+    default: "${CIRCLE_SHA1}"
   oidc-role-arn:
     type: string
-    default: "arn:aws:iam::${AWS_ACCOUNT_ID}:role/CircleCI_Role"  # IAM role for authentication via OIDC
+    default: "arn:aws:iam::${AWS_ACCOUNT_ID}:role/CircleCI_Role"
 
-# Define executors
 executors:
   perl_test_env:
     docker:
       - image: perl:5.32
-      - run:
-          name: Install Cpanm
-          command: curl -L http://cpanmin.us | perl - App::cpanminus
 
-# Define reusable command sequences
 commands:
   aws_auth:
     parameters:
@@ -55,9 +36,8 @@ commands:
     steps:
       - aws-cli/setup:
           profile_name: CircleCI
-          role_arn: << parameters.role_arn >>  # Authenticate using AWS OIDC role
+          role_arn: << parameters.role_arn >>
 
-# Define jobs
 jobs:
   build:
     docker:
@@ -85,39 +65,34 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Install Cpanm
+          command: curl -L http://cpanmin.us | perl - App::cpanminus
+      - run:
           name: Install Perl::Tidy
           command: cpanm Perl::Tidy
       - run:
           name: Run perltidy check
           command: |
-            echo "Finding Perl files modified in the last 14 days..."
             FILES=$(find $(pwd) -type f \( -name "*.pl" -o -name "*.pm" -o -name "*.t" \) -mtime -14)
-
             if [ -z "$FILES" ]; then
               echo "No Perl files found to check!"
               exit 1
             fi
-
             echo "Found files:"
             echo "$FILES"
             echo ""
-
             echo "Checking Perl files formatting..."
             echo "--------------------------------"
-
-            HAS_ISSUES=0
-
-            JOINED_FILES=$(printf "%s " "${FILES[@]}")
-
-            perltidy -pro=.perltidyrc -b "${JOINED_FILES}" > /dev/null 2>&1
-
-            rm *.bak
-         
+            perltidy -pro=.perltidyrc -b $FILES > /dev/null 2>&1
+            rm -f *.bak
 
   perlcritic:
     executor: perl_test_env
     steps:
       - checkout
+      - run:
+          name: Install Cpanm
+          command: curl -L http://cpanmin.us | perl - App::cpanminus
       - run:
           name: Install Perl::Critic
           command: cpanm Perl::Critic
@@ -125,21 +100,16 @@ jobs:
           name: Run perlcritic check
           command: |
             FILES=$(find $(pwd) -type f \( -name "*.pl" -o -name "*.pm" -o -name "*.t" \) -mtime -14)
-
             if [ -z "$FILES" ]; then
               echo "No Perl files found to check!"
               exit 1
             fi
-
             echo "Found files:"
             echo "$FILES"
             echo ""
-
             echo "Running Perl::Critic analysis..."
             echo "--------------------------------"
-
             HAS_ISSUES=0
-
             for file in $FILES; do
               echo "Analyzing $file..."
               if ! perlcritic --stern "$file"; then
@@ -147,9 +117,7 @@ jobs:
                 HAS_ISSUES=1
               fi
             done
-
             echo "--------------------------------"
-
             if [ "$HAS_ISSUES" -eq 1 ]; then
               echo "Some files have code quality issues. Please fix them locally."
               exit 1
@@ -182,7 +150,30 @@ jobs:
             echo "--------------------------------"
             perl -Ilib t/*.t
 
-# Define the workflow
+  perltidy_check:
+    docker:
+      - image: perl:5.32
+    steps:
+      - checkout
+      - run:
+          name: Install Perl::Tidy
+          command: cpan Perl::Tidy
+      - run:
+          name: Run Perltidy Check
+          command: |
+            find . -name "*.pl" -o -name "*.pm" -o -name "*.t" | while read file; do
+              perltidy -pro=.perltidyrc -b -bext='/' "$file"
+              if [ -f "${file}.bak" ]; then
+                diff "$file" "${file}.bak" > /dev/null
+                if [ $? -ne 0 ]; then
+                  echo "Code style issues found in $file"
+                  rm "${file}.bak"
+                  exit 1
+                fi
+                rm "${file}.bak"
+              fi
+            done
+
 workflows:
   build_and_test:
     jobs:
@@ -211,25 +202,6 @@ workflows:
       - test:
           requires:
             - build
-:
-      - image: perl:5.32
-    steps:
-      - checkout
-      - run:
-          name: Install Perltidy
-          command: cpan Perl::Tidy
-      - run:
-          name: Run Perltidy Check
-          command: |
-            find . -name "*.pl" -o -name "*.pm" -o -name "*.t" | while read file; do
-              perltidy -pro=.perltidyrc -b -bext='/' "$file"
-              if [ -f "${file}.bak" ]; then
-                diff "$file" "${file}.bak" > /dev/null
-                if [ $? -ne 0 ]; then
-                  echo "Code style issues found in $file"
-                  rm "${file}.bak"
-                  exit 1
-                fi
-                rm "${file}.bak"
-              fi
-            done
+      - perltidy_check:
+          requires:
+            - build
