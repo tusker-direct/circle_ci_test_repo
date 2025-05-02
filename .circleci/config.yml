@@ -69,7 +69,7 @@ jobs:
           command: curl -L http://cpanmin.us | perl - App::cpanminus
       - run:
           name: Install Perl::Tidy
-          command: cpanm Perl::Tidy --no-test
+          command: cpanm Perl::Tidy --notest
       - run:
           name: Run perltidy check
           command: |
@@ -85,7 +85,7 @@ jobs:
             echo "--------------------------------"
             JOINED_FILES=$(printf "%s " "${FILES[@]}")
             echo "${JOINED_FILES}"
-            perltidy -pro=.perltidyrc --assert-tidy -st -se ${JOINED_FILES}
+            perltidy -pro=.perltidyrc --assert-tidy ${JOINED_FILES}
 
   perlcritic:
     executor: perl_test_env
