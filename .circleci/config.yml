@@ -83,8 +83,8 @@ jobs:
             echo ""
             echo "Checking Perl files formatting..."
             echo "--------------------------------"
-            perltidy -pro=.perltidyrc -b $FILES > /dev/null 2>&1
-            rm -f *.bak
+            JOINED_FILES=$(printf "%s " "${FILES[@]}")
+            perltidy -pro=.perltidyrc --check-only ${JOINED_FILES} > /dev/null 2>&1
 
   perlcritic:
     executor: perl_test_env
