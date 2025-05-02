@@ -1,24 +1,235 @@
 version: 2.1
 
 jobs:
-  test:
+  build:
     docker:
       - image: cimg/base:stable
     steps:
       - checkout
-      - run:
-          name: Run simple test
-          command: echo "Running tests on circleci_test branch"
 
+  perltidy_check:
+    docker# Use the latest 2.1 version of CircleCI pipeline process engine.
+# See: https://circleci.com/docs/configuration-reference
+version: 2.1
+
+# Import reusable packages (orbs) for AWS ECR, AWS CLI, and ECR scanning
+orbs:
+  aws-ecr: circleci/aws-ecr@9.0.2
+  aws-cli: circleci/aws-cli@4.1
+  ecr-scan-orb: tusker-direct/ecr-scan-orb@1.0
+
+# Define configurable parameters for the pipeline
+parameters:
+  service-name:
+    type: string
+    default: "circleci-test"  # Name of the service
+  image-repo-name:
+    type: string
+    default: "tusker-direct/circleci-test"  # ECR repository path
+  image-name:
+    type: string
+    default: "${AWS_ECR_REGISTRY_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/tusker-direct/redis_test"  # Full ECR image URI
+  image-tag:
+    type: string
+    default: "${CIRCLE_SHA1}"  # Image tag using the current commit SHA
+  oidc-role-arn:
+    type: string
+    default: "arn:aws:iam::${AWS_ACCOUNT_ID}:role/CircleCI_Role"  # IAM role for authentication via OIDC
+
+# Define executors
+executors:
+  perl_test_env:
+    docker:
+      - image: perl:5.32
+      - run:
+          name: Install Cpanm
+          command: curl -L http://cpanmin.us | perl - App::cpanminus
+
+# Define reusable command sequences
+commands:
+  aws_auth:
+    parameters:
+      role_arn:
+        type: string
+        default: << pipeline.parameters.oidc-role-arn >>
+    steps:
+      - aws-cli/setup:
+          profile_name: CircleCI
+          role_arn: << parameters.role_arn >>  # Authenticate using AWS OIDC role
+
+# Define jobs
+jobs:
+  build:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - checkout
+      - aws-ecr/build_and_push_image:
+          auth:
+            - aws-cli/setup:
+                profile_name: CircleCI
+                role_arn: << pipeline.parameters.oidc-role-arn >>
+          profile_name: CircleCI
+          create_repo: true
+          path: .
+          platform: linux/amd64
+          push_image: true
+          repo: tusker-direct/<< pipeline.parameters.service-name >>
+          tag: "${CIRCLE_SHA1}"
+          extra_build_args: --provenance false
+          setup_remote_docker: true
+          remote_docker_layer_caching: true
+
+  style_check:
+    executor: perl_test_env
+    steps:
+      - checkout
+      - run:
+          name: Install Perl::Tidy
+          command: cpanm Perl::Tidy
+      - run:
+          name: Run perltidy check
+          command: |
+            echo "Finding Perl files modified in the last 14 days..."
+            FILES=$(find $(pwd) -type f \( -name "*.pl" -o -name "*.pm" -o -name "*.t" \) -mtime -14)
+
+            if [ -z "$FILES" ]; then
+              echo "No Perl files found to check!"
+              exit 1
+            fi
+
+            echo "Found files:"
+            echo "$FILES"
+            echo ""
+
+            echo "Checking Perl files formatting..."
+            echo "--------------------------------"
+
+            HAS_ISSUES=0
+
+            JOINED_FILES=$(printf "%s " "${FILES[@]}")
+
+            perltidy -pro=.perltidyrc -b "${JOINED_FILES}" > /dev/null 2>&1
+
+            rm *.bak
+         
+
+  perlcritic:
+    executor: perl_test_env
+    steps:
+      - checkout
+      - run:
+          name: Install Perl::Critic
+          command: cpanm Perl::Critic
+      - run:
+          name: Run perlcritic check
+          command: |
+            FILES=$(find $(pwd) -type f \( -name "*.pl" -o -name "*.pm" -o -name "*.t" \) -mtime -14)
+
+            if [ -z "$FILES" ]; then
+              echo "No Perl files found to check!"
+              exit 1
+            fi
+
+            echo "Found files:"
+            echo "$FILES"
+            echo ""
+
+            echo "Running Perl::Critic analysis..."
+            echo "--------------------------------"
+
+            HAS_ISSUES=0
+
+            for file in $FILES; do
+              echo "Analyzing $file..."
+              if ! perlcritic --stern "$file"; then
+                echo "❌ $file ... has issues"
+                HAS_ISSUES=1
+              fi
+            done
+
+            echo "--------------------------------"
+
+            if [ "$HAS_ISSUES" -eq 1 ]; then
+              echo "Some files have code quality issues. Please fix them locally."
+              exit 1
+            else
+              echo "All files passed Perl::Critic analysis!"
+            fi
+
+  image_scan:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - checkout
+      - aws_auth
+      - ecr-scan-orb/scan:
+          profile_name: CircleCI
+          repository_name: << pipeline.parameters.image-repo-name >>
+          image_id: "imageTag=<< pipeline.parameters.image-tag >>"
+          security_policy: CRITICAL
+
+  test:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - checkout
+      - aws_auth
+      - run:
+          name: Run tests
+          command: |
+            echo "Running tests..."
+            echo "--------------------------------"
+            perl -Ilib t/*.t
+
+# Define the workflow
 workflows:
-  version: 2
-  test-workflow:
+  build_and_test:
     jobs:
-      - test:
+      - build:
           filters:
             branches:
-              only: 
-                - circle_ci_config
-            tags:
               only:
-                - circleci_test
+                - test_3_no_test
+      - style_check:
+          requires:
+            - build
+      - perlcritic:
+          requires:
+            - style_check
+
+  build_test_and_push:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only:
+                - test_3_no_test
+      - image_scan:
+          requires:
+            - build
+      - test:
+          requires:
+            - build
+:
+      - image: perl:5.32
+    steps:
+      - checkout
+      - run:
+          name: Install Perltidy
+          command: cpan Perl::Tidy
+      - run:
+          name: Run Perltidy Check
+          command: |
+            find . -name "*.pl" -o -name "*.pm" -o -name "*.t" | while read file; do
+              perltidy -pro=.perltidyrc -b -bext='/' "$file"
+              if [ -f "${file}.bak" ]; then
+                diff "$file" "${file}.bak" > /dev/null
+                if [ $? -ne 0 ]; then
+                  echo "Code style issues found in $file"
+                  rm "${file}.bak"
+                  exit 1
+                fi
+                rm "${file}.bak"
+              fi
+            done

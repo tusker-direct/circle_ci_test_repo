@@ -1,0 +1,15 @@
+# touch docker compose
+services:
+  web:
+    image: my_app
+    ports: 
+      - "3000:3000"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /home/my_app  # Set the working directory
+    env_file:
+      - .env
+    volumes:
+      - ./my_app:/home/my_app/my_app:ro
+      - ./.env:/home/my_app/.env:ro
