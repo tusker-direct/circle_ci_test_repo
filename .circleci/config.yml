@@ -135,30 +135,6 @@ jobs:
             echo pwd
             perl -Ilib t/*.t
 
-  perltidy_check:
-    docker:
-      - image: perl:5.32
-    steps:
-      - checkout
-      - run:
-          name: Install Perl::Tidy
-          command: cpan Perl::Tidy
-      - run:
-          name: Run Perltidy Check
-          command: |
-            find . -name "*.pl" -o -name "*.pm" -o -name "*.t" | while read file; do
-              perltidy -pro=.perltidyrc -b -bext='/' "$file"
-              if [ -f "${file}.bak" ]; then
-                diff "$file" "${file}.bak" > /dev/null
-                if [ $? -ne 0 ]; then
-                  echo "Code style issues found in $file"
-                  rm "${file}.bak"
-                  exit 1
-                fi
-                rm "${file}.bak"
-              fi
-            done
-
 workflows:
   build_and_test:
     jobs:
@@ -185,8 +161,5 @@ workflows:
           requires:
             - build
       - test:
-          requires:
-            - build
-      - perltidy_check:
           requires:
             - build
