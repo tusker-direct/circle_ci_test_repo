@@ -132,6 +132,7 @@ jobs:
           command: |
             echo "Running tests..."
             echo "--------------------------------"
+            echo pwd
             perl -Ilib t/*.t
 
   perltidy_check:
