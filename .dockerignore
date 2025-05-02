@@ -1,0 +1,4 @@
+*
+!Docker
+!web/conf/etc/init.d
+!docker_build
