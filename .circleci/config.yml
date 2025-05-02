@@ -181,7 +181,7 @@ workflows:
           filters:
             branches:
               only:
-                - test_3_no_test
+                - main
       - style_check:
           requires:
             - build
@@ -195,7 +195,7 @@ workflows:
           filters:
             branches:
               only:
-                - test_3_no_test
+                - main
       - image_scan:
           requires:
             - build
