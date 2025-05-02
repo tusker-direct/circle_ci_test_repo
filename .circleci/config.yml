@@ -64,6 +64,7 @@ jobs:
     executor: perl_test_env
     steps:
       - checkout
+      - setup_remote_docker
       - run:
           name: Install Cpanm
           command: curl -L http://cpanmin.us | perl - App::cpanminus
