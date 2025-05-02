@@ -73,7 +73,7 @@ jobs:
       - run:
           name: Run perltidy check
           command: |
-            FILES=$(find $(pwd/my_app) -type f \( -name "*.pl" -o -name "*.pm" -o -name "*.t" \) -mtime -14)
+            FILES=$(find $(pwd)/my_app -type f \( -name "*.pl" -o -name "*.pm" -o -name "*.t" \) -mtime -14)
             if [ -z "$FILES" ]; then
               echo "No Perl files found to check!"
               exit 1
