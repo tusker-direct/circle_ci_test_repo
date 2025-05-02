@@ -68,4 +68,4 @@ severity = 1
 packages = Data::Dumper File::Find FindBin Log::Log4perl Text::Wrap
 
 [Subroutines::ProhibitSubroutinePrototypes]
-ignore_packages=/root/project/my_app/lib/MyApp.pm
+ignore_packages=MyApp MyApp::Controller::Example Basic
