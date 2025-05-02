@@ -85,7 +85,7 @@ jobs:
             echo "--------------------------------"
             JOINED_FILES=$(printf "%s " "${FILES[@]}")
             echo "${JOINED_FILES}"
-            perltidy -pro=.perltidyrc --check-only ${JOINED_FILES}
+            perltidy -pro=.perltidyrc --assert-tidy -st -se ${JOINED_FILES}
 
   perlcritic:
     executor: perl_test_env
