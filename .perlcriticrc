@@ -2,49 +2,49 @@ severity = 3
 theme = bugs + security + certrec + certrule + core + tusker
 verbose = %f line %l col %c\n    [%s] %p (%e) = %m\n    %r\n
 
-# [InputOutput::RequireCheckedSyscalls]
+[InputOutput::RequireCheckedSyscalls]
 functions = :builtins
 exclude_functions = print close sleep
 
-# [BuiltinFunctions::ProhibitStringyEval]
+[BuiltinFunctions::ProhibitStringyEval]
 allow_includes = 1
 
-# [-CodeLayout::ProhibitHardTabs]
-# [-ControlStructures::ProhibitCascadingIfElse]
-# [-ControlStructures::ProhibitDeepNests]
-# [-ControlStructures::ProhibitPostfixControls]
-# [-Documentation::RequirePodSections]
-# [-ErrorHandling::RequireCarping]
-# [-InputOutput::RequireBracedFileHandleWithPrint]
-# [-InputOutput::RequireCheckedClose]
-# [-Modules::RequireNoMatchVarsWithUseEnglish]
-# [-Modules::RequireVersionVar]
-# [-NamingConventions::ProhibitAmbiguousNames]
-# [-RegularExpressions::RequireExtendedFormatting]
-# [-RegularExpressions::RequireLineBoundaryMatching]
-# [-Subroutines::ProhibitExcessComplexity]
-# [-ValuesAndExpressions::ProhibitConstantPragma]
-# [-ValuesAndExpressions::ProhibitEmptyQuotes]
-# [-ValuesAndExpressions::ProhibitInterpolationOfLiterals]
-# [-ValuesAndExpressions::ProhibitMagicNumbers]
-# [-ValuesAndExpressions::ProhibitNoisyQuotes]
-# [-RegularExpressions::RequireDotMatchAnything]
-# [-Variables::ProhibitReusedNames]
-# [-ValuesAndExpressions::ProhibitImplicitNewlines]
-# [-References::ProhibitDoubleSigils]
-# [-RegularExpressions::ProhibitEscapedMetacharacters]
-# [-BuiltinFunctions::ProhibitUselessTopic]
-# [-RegularExpressions::ProhibitFixedStringMatches]
-# [-RegularExpressions::ProhibitEnumeratedClasses]
+[-CodeLayout::ProhibitHardTabs]
+[-ControlStructures::ProhibitCascadingIfElse]
+[-ControlStructures::ProhibitDeepNests]
+[-ControlStructures::ProhibitPostfixControls]
+[-Documentation::RequirePodSections]
+[-ErrorHandling::RequireCarping]
+[-InputOutput::RequireBracedFileHandleWithPrint]
+[-InputOutput::RequireCheckedClose]
+[-Modules::RequireNoMatchVarsWithUseEnglish]
+[-Modules::RequireVersionVar]
+[-NamingConventions::ProhibitAmbiguousNames]
+[-RegularExpressions::RequireExtendedFormatting]
+[-RegularExpressions::RequireLineBoundaryMatching]
+[-Subroutines::ProhibitExcessComplexity]
+[-ValuesAndExpressions::ProhibitConstantPragma]
+[-ValuesAndExpressions::ProhibitEmptyQuotes]
+[-ValuesAndExpressions::ProhibitInterpolationOfLiterals]
+[-ValuesAndExpressions::ProhibitMagicNumbers]
+[-ValuesAndExpressions::ProhibitNoisyQuotes]
+[-RegularExpressions::RequireDotMatchAnything]
+[-Variables::ProhibitReusedNames]
+[-ValuesAndExpressions::ProhibitImplicitNewlines]
+[-References::ProhibitDoubleSigils]
+[-RegularExpressions::ProhibitEscapedMetacharacters]
+[-BuiltinFunctions::ProhibitUselessTopic]
+[-RegularExpressions::ProhibitFixedStringMatches]
+[-RegularExpressions::ProhibitEnumeratedClasses]
 
-# [ClassHierarchies::ProhibitAutoloading]
+[ClassHierarchies::ProhibitAutoloading]
 
-ignore_packages = Tusker::Query
+# ignore_packages = Tusker::Query
 
-# [RegularExpressions::ProhibitComplexRegexes]
+[RegularExpressions::ProhibitComplexRegexes]
 max_characters = 70
 
-#[CodeLayout::RequireTidyCode]
+[CodeLayout::RequireTidyCode]
 #severity = 3
 #perltidyrc = .perltidyrc
 
@@ -53,16 +53,16 @@ max_characters = 70
 # New code will be run with severity -1 to catch these, existing code with -3 to ignore them.
 # (This applies to perlcritic being run in a test pipeline or git hook)
 
-# [Modules::ProhibitAutomaticExportation]
+[Modules::ProhibitAutomaticExportation]
 severity = 1
 
-# [Subroutines::ProhibitManyArgs]
+[Subroutines::ProhibitManyArgs]
 max_arguments = 3
 severity = 1
 skip_object = 1
 
-# [Subroutines::ProhibitUnusedPrivateSubroutines]
+[Subroutines::ProhibitUnusedPrivateSubroutines]
 severity = 1
 
-# [Variables::ProhibitPackageVars]
+[Variables::ProhibitPackageVars]
 packages = Data::Dumper File::Find FindBin Log::Log4perl Text::Wrap
