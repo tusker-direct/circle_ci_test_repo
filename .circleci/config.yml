@@ -60,7 +60,7 @@ jobs:
           setup_remote_docker: true
           remote_docker_layer_caching: true
 
-  style_check:
+  perl_tidy_check:
     executor: perl_test_env
     steps:
       - checkout
@@ -166,12 +166,12 @@ workflows:
             branches:
               only:
                 - main
-      - style_check:
+      - perl_tidy_check:
           requires:
             - build
       - perlcritic:
           requires:
-            - style_check
+            - perl_tidy_check
 
   build_test_and_push:
     jobs:

@@ -37,10 +37,10 @@ allow_includes = 1
 [-RegularExpressions::ProhibitFixedStringMatches]
 [-RegularExpressions::ProhibitEnumeratedClasses]
 
-[Documentation::RequireEndBeforeLastPod]
+[-Documentation::RequireEndBeforeLastPod]
 [ClassHierarchies::ProhibitAutoloading]
 
-[Tusker::ProhibitInlineSQL]
+[-Tusker::ProhibitInlineSQL]
 ignore_packages = Tusker::Query
 
 [RegularExpressions::ProhibitComplexRegexes]
