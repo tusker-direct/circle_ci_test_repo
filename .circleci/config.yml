@@ -127,19 +127,15 @@ jobs:
     steps:
       - checkout
       - aws_auth
-      # - run:
-      #     name: Build Docker Image
-      #     command: docker-compose build
-      # - run:
-      #     name: Run tests in container
-      #     command: docker-compose run --rm carton exec -- prove -v
       - run:
-          name: Run tests
-          command: |
-            echo "Running tests..."
-            echo "--------------------------------"
-            echo pwd
-            perl -Ilib t/*.t
+          name: Build Docker Image
+          command: docker-compose build
+      - run:
+          name: Run Docker Image
+          command: docker-compose up -d
+      - run:
+          name: Run tests in container
+          command: docker exec -it my_app_web_1 bash -c "carton exec -- prove -v t/"
 
 workflows:
   build_and_test:
