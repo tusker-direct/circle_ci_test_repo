@@ -14,6 +14,7 @@ sub startup ($self) {
 
 # Normal route to controller
 	$r->get('/')->to('Example#welcome');
+	return;
 }
 
 1;
