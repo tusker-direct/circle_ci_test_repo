@@ -13,6 +13,8 @@ RUN apt-get update && apt-get install -y \
     mariadb-client \
     libdbd-mariadb-perl \
     ssh \
+    libsqlite3-dev \
+    postgresql-client \
     && rm -rf /var/lib/apt/lists/*  # Clean up to reduce image size
 # install Carton
 RUN curl -L http://cpanmin.us | perl - App::cpanminus && \
@@ -34,7 +36,7 @@ COPY --chown=my_app_user:my_app_group cpanfile /home/my_app
 COPY --chown=my_app_user:my_app_group cpanfile.snapshot /home/my_app
 
 # Install dependencies using Carton
-RUN carton install --deployment
+RUN carton install
 
 EXPOSE 3000
 
