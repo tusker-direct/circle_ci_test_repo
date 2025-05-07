@@ -1,6 +1,6 @@
 package MyApp;
 use Mojo::Base 'Mojolicious', -signatures;
-use MyApp::Database;
+use Data::Dumper;
 
 # This method will run once at server start
 sub startup ($self) {
@@ -12,7 +12,18 @@ sub startup ($self) {
 
 # Initialize database and add helper
 	$self->helper(db => sub {
-		state $db = MyApp::Database->new();
+		my $dsn = "DBI:MariaDB:database=$ENV{DB_NAME};host=$ENV{DB_HOST};port=$ENV{DB_PORT}";
+		my $dbh = DBI->connect(
+			$dsn, 
+			$ENV{DB_USER}, 
+			$ENV{DB_PASSWORD},
+			{
+				RaiseError => 1,
+				AutoCommit => 1,
+				mysql_enable_utf8 => 1
+			}
+		) or die "Can't connect to database: $DBI::errstr";
+		return $dbh;
 	});
 
 # Router
@@ -21,25 +32,6 @@ sub startup ($self) {
 # Normal route to controller
 	$r->get('/')->to('Example#welcome');
 
-# Example route using database
-	$r->get('/user/:id' => sub {
-		my $c = shift;
-		my $user = $c->db->get_user($c->param('id'));
-		$user ? $c->render(json => $user) 
-			  : $c->render(json => {error => 'User not found'}, status => 404);
-	});
-
-# Car routes
-	$r->get('/cars/:id' => sub ($c) {
-		my $car = $c->db->get_car($c->param('id'));
-		$car ? $c->render(json => $car)
-			 : $c->render(json => {error => 'Car not found'}, status => 404);
-	});
-
-	$r->get('/users/:id/cars' => sub ($c) {
-		my $cars = $c->db->get_user_cars($c->param('id'));
-		$c->render(json => $cars);
-	});
 
 	return;
 }

@@ -1,6 +1,7 @@
 FROM perl:latest
 LABEL version="1.0"
 LABEL description="Foo Bar foo.bar@gmail.com"
+
 # add C dependencies 
 RUN apt-get update && apt-get install -y \
     build-essential \
@@ -15,29 +16,33 @@ RUN apt-get update && apt-get install -y \
     ssh \
     libsqlite3-dev \
     postgresql-client \
-    && rm -rf /var/lib/apt/lists/*  # Clean up to reduce image size
-# install Carton
-RUN curl -L http://cpanmin.us | perl - App::cpanminus && \
-    cpanm --notest --verbose Carton
-# create a new user and group for your app 
-RUN groupadd -r my_app_group && useradd -r -g my_app_group -m -d /home/my_app my_app_user
-# create home dir for that user 
-RUN mkdir -p /home/my_app && \
-    chown -R my_app_user:my_app_group /home/my_app
-# switch from root to the new user 
-USER my_app_user
+    && rm -rf /var/lib/apt/lists/*
 
+# Install Perl dependencies as root
+RUN curl -L http://cpanmin.us | perl - App::cpanminus && \
+    cpanm --notest --verbose Carton && \
+    cpanm --notest Mojolicious && \
+    cpanm --notest Exporter::NoWork
+
+# Create user and setup directories
+RUN groupadd -r my_app_group && useradd -r -g my_app_group -m -d /home/my_app my_app_user && \
+    mkdir -p /home/my_app && \
+    chown -R my_app_user:my_app_group /home/my_app
+
+# Switch to app user
+USER my_app_user
 WORKDIR /home/my_app
 
+# Set up environment
 ENV PATH="/home/my_app/.perl/bin:${PATH}"
 
-# Copy application dependencies and files
-COPY --chown=my_app_user:my_app_group cpanfile /home/my_app
-COPY --chown=my_app_user:my_app_group cpanfile.snapshot /home/my_app
-
-# Install dependencies using Carton
+# Copy and install dependencies
+COPY --chown=my_app_user:my_app_group cpanfile /home/my_app/
 RUN carton install
+
+# Copy application files
+COPY --chown=my_app_user:my_app_group . /home/my_app/
 
 EXPOSE 3000
 
-ENTRYPOINT ["carton", "exec", "--", "morbo", "my_app/script/my_app"]
+CMD ["carton", "exec", "--", "morbo", "my_app/script/my_app"]
