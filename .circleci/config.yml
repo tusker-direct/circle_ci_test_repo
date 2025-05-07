@@ -134,6 +134,7 @@ jobs:
           command: |
             docker compose build
             docker compose up -d
+            cd my_app
             echo "PWD: $(pwd)"
             echo "ls:"
             ls -la
