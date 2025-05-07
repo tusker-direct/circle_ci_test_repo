@@ -134,7 +134,8 @@ jobs:
           command: |
             docker compose build
             docker compose up -d
-            docker compose exec -T web bash -c "carton exec -- prove -v my_app/t"
+            echo "PWD: $(pwd)"
+            docker compose exec -T web bash -c "carton exec -- prove -v /my_app/t"
 
 workflows:
   build_and_test:
