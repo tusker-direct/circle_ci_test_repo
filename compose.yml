@@ -30,7 +30,7 @@ services:
       MARIADB_USER: ${DB_USER}
       MARIADB_PASSWORD: ${DB_PASSWORD}
     volumes: 
-      - ${PWD}/maria-data:/var/lib/mysql
+      - maria-data:/var/lib/mysql
       - ${PWD}/my_app/migrations:/docker-entrypoint-initdb.d
     networks:
       - my-app-net
