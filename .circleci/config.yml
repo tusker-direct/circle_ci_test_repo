@@ -132,12 +132,11 @@ jobs:
       - run:
           name: Build and run tests
           command: |
-            docker compose build
-            docker compose up -d
-            cd my_app
             echo "PWD: $(pwd)"
             echo "ls:"
             ls -la
+            docker compose build
+            docker compose up -d
             docker compose exec -T web bash -c "carton exec -- prove -v t"
 
 workflows:
