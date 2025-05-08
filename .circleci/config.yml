@@ -140,7 +140,7 @@ jobs:
             ls -la
             docker compose build
             docker compose up -d
-            docker exec -it project-web-1 bash -c "cd my_app && carton exec -- prove -v t"
+            docker exec -it project-web-1 bash -c "cd my_app && pwd && carton exec -- prove -v t"
 
 workflows:
   build_and_test:
