@@ -1,4 +1,4 @@
-usUSEe my_app;
+use my_app;
 
 CREATE TABLE IF NOT EXISTS cars (
     id INT AUTO_INCREMENT PRIMARY KEY,

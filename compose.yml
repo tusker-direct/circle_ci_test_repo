@@ -9,7 +9,7 @@ services:
       dockerfile: Dockerfile
     working_dir: /home/my_app/  # Set the working directory
     command: >
-      sh -c 'carton exec -- perl my_app/sql/004_uspsert_cars.pl && carton exec -- morbo my_app/script/my_app' 
+      sh -c 'carton exec -- morbo my_app/script/my_app' 
     env_file:
       - .env
     volumes:
@@ -30,8 +30,8 @@ services:
       MARIADB_USER: ${DB_USER}
       MARIADB_PASSWORD: ${DB_PASSWORD}
     volumes: 
-      - maria-data:/var/lib/mysql
-      - ./my_app/migrations:/docker-entrypoint-initdb.d
+      - ${PWD}/maria-data:/var/lib/mysql
+      - ${PWD}/my_app/migrations:/docker-entrypoint-initdb.d
     networks:
       - my-app-net
     healthcheck:
