@@ -14,7 +14,7 @@ services:
       - .env
     volumes:
       - ${PWD}/my_app:/home/my_app/my_app:ro
-      - ${PWD}/.env:/home/my_app/.env:ro
+      # - ${PWD}/.env:/home/my_app/.env:ro
     depends_on:
       database:
         condition: service_healthy
