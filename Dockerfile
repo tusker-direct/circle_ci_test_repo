@@ -38,7 +38,7 @@ ENV PATH="/home/my_app/local/bin:${PATH}"
 COPY --chown=my_app_user:my_app_group cpanfile /home/my_app/
 COPY --chown=my_app_user:my_app_group cpanfile.snapshot /home/my_app
 
-RUN carton install
+RUN carton install --deployment
 # Copy application files
 COPY --chown=my_app_user:my_app_group . /home/my_app/
 
