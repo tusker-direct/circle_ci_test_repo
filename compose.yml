@@ -7,7 +7,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    working_dir: /home/my_app  # Set the working directory
+    working_dir: /home/my_app/  # Set the working directory
+    command: >
+      sh -c 'carton exec -- morbo my_app/script/my_app'
     env_file:
       - .env
     volumes:
@@ -24,22 +26,20 @@ services:
       - "3306:3306"
     environment:
       MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
-      MARIADB_DATABASE: ${MARIADB_DATABASE}
-      MARIADB_USER: ${MARIADB_USER}
-      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+      MARIADB_DATABASE: ${DB_NAME}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
     volumes: 
       - maria-data:/var/lib/mysql
       - ./my_app/migrations:/docker-entrypoint-initdb.d
     networks:
       - my-app-net
     healthcheck:
-      test: ["CMD-SHELL", "mariadb -h127.0.0.1 -uroot -e 'SELECT 1' || exit 1"]
+      test: ["CMD-SHELL", "mariadb -h127.0.0.1 -umyuser -ppassword -e 'SELECT 1' || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 60s
-
-
 volumes:
   maria-data:
 

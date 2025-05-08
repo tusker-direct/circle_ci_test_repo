@@ -1,4 +1,4 @@
-#!/usr/local/opt/perl/bin/perl
+#!/home/dragos/perl5/perlbrew/perls/perl-5.40.2/bin/perl
 use Mojo::Base -strict;
 
 use Mojo::Server::Hypnotoad;

@@ -1,4 +1,4 @@
-requires 'Mojolicious'                          => '9.39';
+requires 'Mojolicious';
 requires 'Dotenv'                               => '0.002';
 requires 'DBI'                                  => '1.647';
 requires 'DBD::MariaDB'                         => '1.23';

@@ -20,9 +20,7 @@ RUN apt-get update && apt-get install -y \
 
 # Install Perl dependencies as root
 RUN curl -L http://cpanmin.us | perl - App::cpanminus && \
-    cpanm --notest --verbose Carton && \
-    cpanm --notest Mojolicious && \
-    cpanm --notest Exporter::NoWork
+    cpanm --notest --verbose Carton
 
 # Create user and setup directories
 RUN groupadd -r my_app_group && useradd -r -g my_app_group -m -d /home/my_app my_app_user && \
@@ -34,12 +32,13 @@ USER my_app_user
 WORKDIR /home/my_app
 
 # Set up environment
-ENV PATH="/home/my_app/.perl/bin:${PATH}"
+ENV PATH="/home/my_app/local/bin:${PATH}"
 
 # Copy and install dependencies
 COPY --chown=my_app_user:my_app_group cpanfile /home/my_app/
-RUN carton install
+COPY --chown=my_app_user:my_app_group cpanfile.snapshot /home/my_app
 
+RUN carton install
 # Copy application files
 COPY --chown=my_app_user:my_app_group . /home/my_app/
 
