@@ -9,7 +9,7 @@ services:
       dockerfile: Dockerfile
     working_dir: /home/my_app/  # Set the working directory
     command: >
-      sh -c 'carton exec -- morbo my_app/script/my_app'
+      sh -c 'carton exec -- perl my_app/sql/004_uspsert_cars.pl && carton exec -- morbo my_app/script/my_app' 
     env_file:
       - .env
     volumes:
@@ -23,7 +23,7 @@ services:
   database:
     image: mariadb
     ports: 
-      - "3306:3306"
+      - "3307:3306"
     environment:
       MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
       MARIADB_DATABASE: ${DB_NAME}

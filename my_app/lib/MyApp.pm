@@ -1,6 +1,7 @@
 package MyApp;
 use Mojo::Base 'Mojolicious', -signatures;
 use Data::Dumper;
+use DBI;
 
 # This method will run once at server start
 sub startup ($self) {
@@ -19,8 +20,7 @@ sub startup ($self) {
 			$ENV{DB_PASSWORD},
 			{
 				RaiseError => 1,
-				AutoCommit => 1,
-				mysql_enable_utf8 => 1
+				AutoCommit => 1
 			}
 		) or die "Can't connect to database: $DBI::errstr";
 		return $dbh;
