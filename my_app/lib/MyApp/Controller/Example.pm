@@ -6,12 +6,14 @@ sub welcome ($self) {
 
 	my $db = $self->db;
 
-	# all cars
-	my $cars = $db->all_cars;
+	my $sth = $db->prepare("SELECT * FROM cars");
+	$sth->execute();
 
+	my $cars = $sth->fetchrow_hashref();
 
 	# Render template "example/welcome.html.ep" with message
-	$self->render(msg => 'Welcome to the Mojolicious real-time web framework!', cars => $cars);
+	# $self->render(msg => 'Welcome to the Mojolicious real-time web framework!', cars => $cars);
+	$self->render(json => $cars);
 	return;
 }
 

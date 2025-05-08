@@ -7,27 +7,42 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    working_dir: /home/my_app  # Set the working directory
+    working_dir: /home/my_app/  # Set the working directory
+    command: >
+      sh -c 'carton exec -- morbo my_app/script/my_app' 
     env_file:
       - .env
     volumes:
       - ./my_app:/home/my_app/my_app:ro
       - ./.env:/home/my_app/.env:ro
     depends_on:
-      - db
-
-  db:
-    image: postgres:15
+      database:
+        condition: service_healthy
+    networks:
+      - my-app-net
+  database:
+    image: mariadb
+    ports: 
+      - "3306:3306"
     environment:
-      POSTGRES_DB: myapp
-      POSTGRES_USER: myapp
-      POSTGRES_PASSWORD: myapppass
-      POSTGRES_HOST_AUTH_METHOD: trust
-    ports:
-      - "5433:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
-
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${DB_NAME}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+    volumes: 
+      - ${PWD}/maria-data:/var/lib/mysql
+      - ${PWD}/my_app/migrations:/docker-entrypoint-initdb.d
+    networks:
+      - my-app-net
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb -h127.0.0.1 -umyuser -ppassword -e 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
 volumes:
-  postgres_data:
+  maria-data:
+
+networks:
+ my-app-net:
+

@@ -49,4 +49,8 @@ docker_build
 docker_logs
 /database/
 test_suites/.tusker_gpg/random_seed
+<<<<<<< HEAD
 local/
+=======
+local/
+>>>>>>> mariadb
