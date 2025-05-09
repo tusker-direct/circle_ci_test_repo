@@ -31,7 +31,7 @@ services:
       MARIADB_USER: ${DB_USER}
       MARIADB_PASSWORD: ${DB_PASSWORD}
     volumes: 
-      - maria-data:/var/lib/mysql
+      #- maria-data:/var/lib/mysql
       - ./my_app/migrations:/docker-entrypoint-initdb.d
     networks:
       - my-app-net
@@ -41,9 +41,9 @@ services:
       timeout: 5s
       retries: 5
       start_period: 60s
-volumes:
-  maria-data:
-    name: maria_data_global
+# volumes:
+#   maria-data:
+#     name: maria_data_global
 
 networks:
  my-app-net:
