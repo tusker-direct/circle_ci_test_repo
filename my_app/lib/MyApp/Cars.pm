@@ -6,8 +6,7 @@ use DBD::MariaDB;
 use Carp 'croak';
 
 sub new {
-	my $class = shift;
-	my ($dbh) = @_;
+	my ($class, $dbh) = @_;
 
 	my $self = {
 		dbh => $dbh,

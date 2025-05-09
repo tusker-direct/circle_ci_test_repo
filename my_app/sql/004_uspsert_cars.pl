@@ -1,3 +1,6 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
 use DBI;
 
 my $dsn = "DBI:MariaDB:database=$ENV{DB_NAME};host=$ENV{DB_HOST};port=$ENV{DB_PORT}";
@@ -31,4 +34,3 @@ my $q = "INSERT IGNORE INTO cars (make, model, year, price) VALUES (?, ?, ?, ?)"
 foreach my $car (@cars) {
 	$dbh->do($q, undef, $car->{brand}, $car->{model}, $car->{year}, $car->{price});
 }
-

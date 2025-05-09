@@ -1,3 +1,5 @@
+#!/usr/bin/env perl
+
 package basic;
 use Mojo::Base -strict;
 
@@ -17,4 +19,4 @@ is($response->{model}, 'Duster', 'model is Duster');
 is($response->{year},  2010,     'Year is 2010');
 
 done_testing();
-1;
+
