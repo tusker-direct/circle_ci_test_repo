@@ -29,8 +29,8 @@ $dbh->do($db_cars_table);
 
 my @cars = ({ 
 	brand => 'Dacia',
-	model => '1',
-	year => 2001,
+	model => 'Duster',
+	year => 2010,
 	price => 2000
 },
 {
