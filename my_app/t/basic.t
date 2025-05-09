@@ -11,10 +11,10 @@ $t->get_ok('/')->status_is(200);
 
 my $response = $t->tx->res->json;
 
-is($response->{id}, 1, 'ID is 1');
-is($response->{make}, 'Dacia', 'Make is Dacia');
+is($response->{id},    1,        'ID is 1');
+is($response->{make},  'Dacia',  'Make is Dacia');
 is($response->{model}, 'Duster', 'model is Duster');
-is($response->{year}, 2010, 'Year is 2010');
+is($response->{year},  2010,     'Year is 2010');
 
 done_testing();
 1;
