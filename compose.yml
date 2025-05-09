@@ -12,9 +12,9 @@ services:
       sh -c 'carton exec -- perl my_app/utils/db-migrate.pl && carton exec -- morbo my_app/script/my_app' 
     env_file:
       - .env
-    # volumes:
-    #   - ${PWD}/my_app:/home/my_app/my_app:ro
-    #   - ${PWD}/.env:/home/my_app/.env:ro
+    volumes:
+      - ${PWD}/my_app:/home/my_app/my_app:ro
+      - ./.env:/home/my_app/.env:ro
     depends_on:
       database:
         condition: service_healthy
@@ -25,26 +25,18 @@ services:
     container_name: circle_ci_test_repo-database-1
     ports: 
       - "3306:3306"
-    environment:
-      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
-      MARIADB_DATABASE: ${DB_NAME}
-      MARIADB_USER: ${DB_USER}
-      MARIADB_PASSWORD: ${DB_PASSWORD}
+    env_file:
+      - .env
     volumes: 
-      #- maria-data:/var/lib/mysql
       - ./my_app/migrations:/docker-entrypoint-initdb.d
+      - ./my_app/utils/db_health_check.sh:/healthcheck.sh
     networks:
       - my-app-net
     healthcheck:
-      test: ["CMD-SHELL", "mariadb -h127.0.0.1 -umyuser -ppassword -e 'SELECT 1' || exit 1"]
+      test: ["CMD-SHELL", "/healthcheck.sh"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 60s
-# volumes:
-#   maria-data:
-#     name: maria_data_global
-
 networks:
  my-app-net:
-
