@@ -6,14 +6,14 @@ services:
       - "3000:3000"
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: DockerfileTest
     working_dir: /home/my_app/  # Set the working directory
     command: >
       sh -c 'carton exec -- morbo my_app/script/my_app' 
     env_file:
       - .env
-    volumes:
-      - ${PWD}/my_app:/home/my_app/my_app:ro
+    # volumes:
+    #   - ${PWD}/my_app:/home/my_app/my_app:ro
       # - ${PWD}/.env:/home/my_app/.env:ro
     depends_on:
       database:
