@@ -9,12 +9,12 @@ services:
       dockerfile: DockerfileTest
     working_dir: /home/my_app/  # Set the working directory
     command: >
-      sh -c 'carton exec -- morbo my_app/script/my_app' 
+      sh -c 'carton exec -- perl my_app/utils/db-migrate.pl && carton exec -- morbo my_app/script/my_app' 
     env_file:
       - .env
     # volumes:
     #   - ${PWD}/my_app:/home/my_app/my_app:ro
-      # - ${PWD}/.env:/home/my_app/.env:ro
+    #   - ${PWD}/.env:/home/my_app/.env:ro
     depends_on:
       database:
         condition: service_healthy
