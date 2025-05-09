@@ -5,7 +5,7 @@ services:
     ports: 
       - "3000:3000"
     build:
-      context: /.
+      context: .
       dockerfile: DockerfileTest
     working_dir: /home/my_app/  # Set the working directory
     command: >
@@ -31,7 +31,7 @@ services:
       MARIADB_PASSWORD: ${DB_PASSWORD}
     volumes: 
       - maria-data:/var/lib/mysql
-      - ${PWD}/my_app/migrations:/docker-entrypoint-initdb.d
+      - ./my_app/migrations:/docker-entrypoint-initdb.d
     networks:
       - my-app-net
     healthcheck:
