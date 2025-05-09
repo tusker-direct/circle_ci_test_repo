@@ -43,6 +43,7 @@ services:
       start_period: 60s
 volumes:
   maria-data:
+    name: maria_data_global
 
 networks:
  my-app-net:
