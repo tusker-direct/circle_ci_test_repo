@@ -5,7 +5,7 @@ services:
     ports: 
       - "3000:3000"
     build:
-      context: .
+      context: /.
       dockerfile: DockerfileTest
     working_dir: /home/my_app/  # Set the working directory
     command: >
