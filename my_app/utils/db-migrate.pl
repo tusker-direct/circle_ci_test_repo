@@ -30,8 +30,7 @@ SQL
 
 $dbh->do($db_cars_table);
 
-my @cars = (
-	{
+my @cars = ({
 		brand => 'Dacia',
 		model => 'Duster',
 		year  => 2010,
@@ -51,4 +50,4 @@ foreach my $car (@cars) {
 	$dbh->do($q, undef, $car->{brand}, $car->{model}, $car->{year}, $car->{price});
 }
 
-1;  # Optional but satisfies Perl::Critic
+1;    # Optional but satisfies Perl::Critic
