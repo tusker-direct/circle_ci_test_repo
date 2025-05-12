@@ -32,7 +32,7 @@ services:
       - .env
     volumes: 
       - ./my_app/migrations:/docker-entrypoint-initdb.d
-      - ./my_app/utils/db_health_check.sh:/healthcheck.sh
+      - ./my_app/utils/db_health_check.sh:/healthcheck.sh:ro
       - ./.env:/home/my_app/.env:ro
     networks:
       - my-app-net
