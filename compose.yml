@@ -37,7 +37,7 @@ services:
     networks:
       - my-app-net
     healthcheck:
-      test: ["CMD-SHELL", "/healthcheck.sh"]
+      test: ["CMD-SHELL", "echo 'Starting healthcheck'; echo $MYSQL_USER; mariadb -h127.0.0.1 -u$MYSQL_USER -p$MYSQL_PASSWORD -e 'SELECT 1' $MYSQL_DATABASE > /dev/null 2>&1 || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
