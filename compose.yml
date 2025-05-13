@@ -37,7 +37,7 @@ services:
     networks:
       - my-app-net
     healthcheck:
-      test: ["sh -c /healthcheck.sh"]
+      test: ["CMD", "/healthcheck.sh"]
       interval: 10s
       timeout: 5s
       retries: 5
