@@ -12,9 +12,9 @@ services:
       sh -c 'carton exec -- perl my_app/utils/db-migrate.pl && carton exec -- morbo my_app/script/my_app' 
     env_file:
       - .env
-    volumes:
-      - ${PWD}/my_app:/home/my_app/my_app:ro
-      - ./.env:/home/my_app/.env:ro
+    # volumes:
+    #   - ${PWD}/my_app:/home/my_app/my_app:ro
+    #   - ./.env:/home/my_app/.env:ro
     depends_on:
       database:
         condition: service_healthy
