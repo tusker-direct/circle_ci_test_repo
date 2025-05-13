@@ -6,22 +6,18 @@ services:
       - "3000:3000"
     build:
       context: .
-      dockerfile: DockerfileTest
+      dockerfile: Dockerfile
     working_dir: /home/my_app/  # Set the working directory
     command: >
       sh -c 'carton exec -- perl my_app/utils/db-migrate.pl && carton exec -- morbo my_app/script/my_app' 
     env_file:
       - .env
-    # volumes:
-    #   - ${PWD}/my_app:/home/my_app/my_app:ro
-    #   - ./.env:/home/my_app/.env:ro
     depends_on:
       database:
         condition: service_healthy
     networks:
       - my-app-net
   database:
-    # image: mariadb
     build:
       context: .
       dockerfile: DockerfileDB
@@ -30,10 +26,6 @@ services:
       - "3306:3306"
     env_file:
       - .env
-    # volumes: 
-    #   - ./my_app/migrations:/docker-entrypoint-initdb.d
-    #   - ./my_app/utils/db_health_check.sh:/healthcheck.sh:ro
-    #   - ./.env:/home/my_app/.env:ro
     networks:
       - my-app-net
     healthcheck:

@@ -36,6 +36,8 @@ ENV PATH="/home/my_app/local/bin:${PATH}"
 # Copy and install dependencies
 COPY --chown=my_app_user:my_app_group cpanfile /home/my_app/
 COPY --chown=my_app_user:my_app_group cpanfile.snapshot /home/my_app
+COPY --chown=my_app_user:my_app_group my_app /home/my_app
+COPY --chown=my_app_user:my_app_group .env .env
 
 RUN carton install --deployment
 # Copy application files
