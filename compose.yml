@@ -21,19 +21,19 @@ services:
     networks:
       - my-app-net
   database:
-    image: mariadb
-    # build:
-    #   context: .
-    #   dockerfile: DockerfileDB
+    # image: mariadb
+    build:
+      context: .
+      dockerfile: DockerfileDB
     container_name: circle_ci_test_repo-database-1
     ports: 
       - "3306:3306"
     env_file:
       - .env
-    volumes: 
-      - ./my_app/migrations:/docker-entrypoint-initdb.d
-      - ./my_app/utils/db_health_check.sh:/healthcheck.sh:ro
-      - ./.env:/home/my_app/.env:ro
+    # volumes: 
+    #   - ./my_app/migrations:/docker-entrypoint-initdb.d
+    #   - ./my_app/utils/db_health_check.sh:/healthcheck.sh:ro
+    #   - ./.env:/home/my_app/.env:ro
     networks:
       - my-app-net
     healthcheck:

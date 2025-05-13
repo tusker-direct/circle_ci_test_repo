@@ -1,0 +1,8 @@
+FROM mariadb:latest
+
+
+# RUN chmod +x /healthcheck.sh
+COPY .env /env_vars.env
+COPY ./my_app/utils/db_health_check.sh /healthcheck.sh
+RUN chmod +x ./healthcheck.sh
+RUN ls -la ./healthcheck.sh
