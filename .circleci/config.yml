@@ -152,4 +152,4 @@ workflows:
       - image_scan:
           requires: [build]
       - test:
-          requires: [build]
+          requires: [perlcritic]
