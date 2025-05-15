@@ -148,8 +148,8 @@ workflows:
       - perl_tidy_check:
           requires: [build]
       - perlcritic:
-          requires: [perl_tidy_check]
+          requires: [build]
       - image_scan:
           requires: [build]
       - test:
-          requires: [perlcritic]
+          requires: [build]
