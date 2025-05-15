@@ -38,6 +38,26 @@ commands:
           profile_name: CircleCI
           role_arn: << parameters.role_arn >>
 
+  install_cpanm:
+    steps:
+      - run:
+          name: Install cpanminus
+          command: curl -L http://cpanmin.us | perl - App::cpanminus
+
+  perl_file_finder:
+    steps:
+      - run:
+          name: Find recent Perl files
+          command: |
+            export FILES=$(find $(pwd)/my_app -type f \( -name "*.pl" -o -name "*.pm" -o -name "*.t" \) -mtime -14)
+            echo "$FILES" > perl_files.txt
+            if [ -z "$FILES" ]; then
+              echo "No Perl files found to check!"
+              exit 1
+            fi
+            echo "Found Perl files:"
+            echo "$FILES"
+
 jobs:
   build:
     docker:
@@ -55,7 +75,7 @@ jobs:
           platform: linux/amd64
           push_image: true
           repo: tusker-direct/<< pipeline.parameters.service-name >>
-          tag: "${CIRCLE_SHA1}"
+          tag: << pipeline.parameters.image-tag >>
           extra_build_args: --provenance false
           setup_remote_docker: true
           remote_docker_layer_caching: true
@@ -65,50 +85,29 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run:
-          name: Install Cpanm
-          command: curl -L http://cpanmin.us | perl - App::cpanminus
+      - install_cpanm
       - run:
           name: Install Perl::Tidy
           command: cpanm Perl::Tidy --notest
+      - perl_file_finder
       - run:
           name: Run perltidy check
           command: |
-            FILES=$(find $(pwd)/my_app -type f \( -name "*.pl" -o -name "*.pm" -o -name "*.t" \) -mtime -14)
-            if [ -z "$FILES" ]; then
-              echo "No Perl files found to check!"
-              exit 1
-            fi
-            echo ""
-            echo "Checking Perl files formatting..."
-            echo "--------------------------------"
-            JOINED_FILES=$(printf "%s " "${FILES[@]}")
-            echo "${JOINED_FILES}"
-            perltidy -pro=.perltidyrc --assert-tidy ${JOINED_FILES}
+            perltidy -pro=.perltidyrc --assert-tidy $(cat perl_files.txt)
 
   perlcritic:
     executor: perl_test_env
     steps:
       - checkout
-      - run:
-          name: Install Cpanm
-          command: curl -L http://cpanmin.us | perl - App::cpanminus
+      - install_cpanm
       - run:
           name: Install Perl::Critic
           command: cpanm Perl::Critic --notest
+      - perl_file_finder
       - run:
           name: Run perlcritic check
           command: |
-            FILES=$(find $(pwd)/my_app -type f \( -name "*.pl" -o -name "*.pm" -o -name "*.t" \) -mtime -14)
-            if [ -z "$FILES" ]; then
-              echo "No Perl files found to check!"
-              exit 1
-            fi
-            echo "Running Perl::Critic analysis..."
-            echo "--------------------------------"
-            JOINED_FILES=$(printf "%s " "${FILES[@]}")
-            echo "${JOINED_FILES}"
-            perlcritic --profile-strictness fatal ${JOINED_FILES}
+            perlcritic --profile-strictness fatal $(cat perl_files.txt)
 
   image_scan:
     docker:
@@ -133,40 +132,24 @@ jobs:
           name: Build and run tests
           command: |
             echo "PWD: $(pwd)"
-            echo "#########"
-            file .env
-            echo "#########"
-            echo "ls:"
+            file .env || true
             ls -la
             docker compose build
             docker compose up -d
-            docker exec -it project-web-1 bash -c "cd my_app && pwd && ls -la && carton exec -- prove -v t/"
+            docker exec -it project-web-1 bash -c "cd my_app && carton exec -- prove -v t/"
 
 workflows:
-  build_and_test:
-    jobs:
-      - build:
-          filters:
-            branches:
-              only:
-                - main
-      - perl_tidy_check:
-          requires:
-            - build
-      - perlcritic:
-          requires:
-            - perl_tidy_check
-
   build_test_and_push:
     jobs:
       - build:
           filters:
             branches:
-              only:
-                - main
+              only: [main]
+      - perl_tidy_check:
+          requires: [build]
+      - perlcritic:
+          requires: [perl_tidy_check]
       - image_scan:
-          requires:
-            - build
+          requires: [build]
       - test:
-          requires:
-            - build
+          requires: [build]
